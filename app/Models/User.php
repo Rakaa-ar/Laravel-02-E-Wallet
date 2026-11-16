@@ -15,6 +15,8 @@ class User extends Authenticatable
         'password',
         'account_number',
         'pin',
+        'pin_attempts',
+        'pin_locked_until',
         'google_id',
         'otp',
         'otp_expires_at',
@@ -31,6 +33,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
+            'pin_locked_until'  => 'datetime',
             'otp_expires_at'    => 'datetime',
             'is_verified'       => 'boolean',
         ];

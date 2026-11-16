@@ -52,7 +52,7 @@ class WalletController extends Controller
             'jumlah.min' => 'Nominal minimal transaksi Rp 1.000'
         ]);
 
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         if ($request->jenis === 'keluar') {
             $request->validate([
@@ -62,11 +62,9 @@ class WalletController extends Controller
                 'pin.digits' => 'PIN harus 6 digit angka.'
             ]);
 
-            if (!$user->pin) {
-                return back()->with('error', 'Anda belum membuat pin keamanan silahkan buat terlebih dahulu');
-            }
-            if (!Hash::check($request->pin, $user->pin)) {
-                return back()->with('error', 'PIN kemanan salah!');
+            $errorPin = $this->verifikasiPin($user, $request->pin);
+            if ($errorPin) {
+                return back()->with('error', $errorPin);
             }
         }
 
@@ -139,14 +137,11 @@ class WalletController extends Controller
             return back()->with('error', $validator->errors()->first());
         }
 
-        $pengirimUser = Auth::user();
+        $pengirimUser = User::find(Auth::id());
 
-        if (!$pengirimUser->pin) {
-            return back()->with('error', 'Anda belum membuat PIN Keamanan. Silakan buat PIN terlebih dahulu!');
-        }
-
-        if (!Hash::check($request->pin, $pengirimUser->pin)) {
-            return back()->with('error', 'PIN Keamanan transaksi Anda salah!');
+        $errorPin = $this->verifikasiPin($pengirimUser, $request->pin);
+        if ($errorPin) {
+            return back()->with('error', $errorPin);
         }
 
         $pengirimWallet = Wallet::where('user_id', $pengirimUser->id)->first();
@@ -261,4 +256,70 @@ class WalletController extends Controller
             'nama' => $penerima->name
         ]);
     }
+
+    public function verifikasiPin($user, $inputPin)
+    {
+        if (!$user->pin) {
+            return 'Anda Belum Membuat 6-Digit PIN transaksi!';
+        } 
+
+        // cek dlu akun kena blokir ga
+        if ($user->pin_lock_until && now()->lessThan($user->pin_locked_until)) {
+            $sisaMenit = ceil(now()->diffInSeconds($user->pin_locked_until) /60);
+            return "Transaksi di blokir sementara karna 3x salah PIN. COBA LAGI DALAM {$sisaMenit} Menit.";
+        }
+
+        // Cocokkan pin input sama hash di db
+        if (!Hash::check($inputPin, $user->pin)) {
+            $attempts = $user->pin_attempts + 1;
+
+            if ($attempts >= 3) {
+                $user->update([
+                    'pin_attempts' => 0,
+                    'pin_locked_until' => now()->addMinutes(15),
+                ]);
+                return 'PIN SALAH 3 KALI ANDA DI BLOKIR COBA 15 MENIT LAGI.';
+            }
+
+            $user->update(['pin_attempts' => $attempts]);
+            $sisa = 3 - $attempts;
+            return "PIN keamanan Salah! sisa percobaan: {$sisa} kali lagi";
+        }
+
+        // Jika pin benar maka false sebelumnya clear
+        if ($user->pin_attempts > 0 || $user->pin_locked_until) {
+            $user->update([
+                'pin_attempts' => 0,
+                'pin_locked_until' => null,
+            ]);
+        }
+
+        return null;
+    } 
+
+    public function updatePin(Request $request)
+    {
+        $request->validate([
+            'old_pin' => 'required|digits:6',
+            'new_pin' => 'required|digits:6|confirmed|different:old_pin',
+        ], [
+            'new_pin.different' => 'PIN baru tidak boleh sama dengan PIN lama',
+            'new_pin.confirmed' => 'Konfirmasi PIN baru tidak cocok bray',
+            'new_pin.digits' => 'PIN baru harus berupa 6 digit angka bray',
+        ]);
+
+        $user = User::find(Auth::id());
+
+        $errorPin = $this->verifikasiPin($user, $request->old_pin);
+        if ($errorPin) {
+            return back()->with('error', $errorPin);
+        }
+
+        $user->update([
+            'pin' => Hash::make($request->new_pin),
+        ]);
+
+        return back()->with('success', 'PIN KEAMANAN BERHASIL DI PERBARUI');
+    }
+
 }
