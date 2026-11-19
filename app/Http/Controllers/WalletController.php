@@ -73,15 +73,20 @@ class WalletController extends Controller
             ['saldo' => 0]
         );
 
-        if ($request->jenis === 'keluar' && $dompet->saldo < $request->jumlah) {
-            return back()->with('error', 'Tarik Tunai Gagal: Saldo anda tidak mencukupi');
-        }
+        $totalKeluarHariIni = $dompet->transaksi()
+            ->where('jenis', 'keluar')
+            ->whereDate('created_at', today())
+            ->sum('jumlah');
+
+        $tipeTransaksi = $request->jenis === 'masuk' ? 'topup' : 'tarik';
 
         try {
             $response = Http::timeout(5)->post('http://localhost:8080/api/transaksi', [
                 'saldo_saat_ini' => (float) $dompet->saldo,
                 'jenis' => $request->jenis,
-                'jumlah' => (float) $request->jumlah
+                'tipe_transaksi' => $tipeTransaksi,
+                'jumlah' => (float) $request->jumlah,
+                'total_keluar_hari_ini' => (float) $totalKeluarHariIni
             ]);
 
             $result = $response->json();
@@ -94,13 +99,16 @@ class WalletController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($dompet, $request, $result) {
-                // Catat Riwayat
+            $biayaAdmin = $result['biaya_admin'] ?? 0;
+
+            DB::transaction(function () use ($dompet, $request, $result, $biayaAdmin) {
+                $catatanAdmin = $biayaAdmin > 0 ? ' (Admin Rp ' . number_format($biayaAdmin, 0, ',', '.') . ')' : '';
+                //catatan riwayat nominal
                 $dompet->transaksi()->create([
                     'kode_transaksi' => 'TRX-' . date('YmdHis') . '-' . rand(100, 999),
                     'jenis'          => $request->jenis,
-                    'jumlah'         => $request->jumlah,
-                    'keterangan'     => $request->keterangan
+                    'jumlah'         => $request->jumlah + $biayaAdmin,
+                    'keterangan'     => ($request->keterangan ?? ($request->jenis == 'masuk' ? 'Top Up Saldo' : 'Tarik Tunai')) . $catatanAdmin
                 ]);
 
                 // Update Saldo
@@ -110,7 +118,8 @@ class WalletController extends Controller
 
             //Pesan Sukses Dinamis
             $tipeTransaksi = $request->jenis == 'masuk' ? 'Top-Up Saldo' : 'Tarik Tunai';
-            return redirect('/dompet')->with('success', $tipeTransaksi . ' Rp ' . number_format($request->jumlah, 0, ',', '.') . ' berhasil!');
+            $infoAdmin = $biayaAdmin > 0 ? ' + Biaya Admin Rp ' . number_format($biayaAdmin, 0, ',', '.') : '';
+            return redirect('/dompet')->with('success', $tipeTransaksi . ' Rp ' . number_format($request->jumlah, 0, ',', '.') . $infoAdmin . ' berhasil!');
         } catch (\Exception $e) {
             return back()->with('error', 'Sistem terputus! Gagal memproses transaksi database.');
         }
@@ -158,12 +167,19 @@ class WalletController extends Controller
             ['saldo'   => 0]
         );
 
+        $totalKeluarHariIni =  $pengirimWallet->transaksi()
+            ->where('jenis', 'keluar')
+            ->whereDate('created_at', today())
+            ->sum('jumlah');
+
         // Cek Kecukupan Saldo ke Go Microservice
         try {
             $response = Http::timeout(5)->post('http://localhost:8080/api/transaksi', [
                 'saldo_saat_ini' => (float) $pengirimWallet->saldo,
                 'jenis'          => 'keluar',
-                'jumlah'         => (float) $request->jumlah
+                'jumlah'         => (float) $request->jumlah,
+                'tipe_transaksi' => 'transfer',
+                'total_keluar_hari_ini' => (float) $totalKeluarHariIni,
             ]);
 
             $result = $response->json();
@@ -177,8 +193,11 @@ class WalletController extends Controller
 
         // Transaksi DB Atomik
         try {
-            DB::transaction(function () use ($pengirimWallet, $penerimaWallet, $pengirimUser, $penerimaUser, $request, $result) {
+            $biayaAdmin = $result['biaya_admin'] ?? 0;
+
+            DB::transaction(function () use ($pengirimWallet, $penerimaWallet, $pengirimUser, $penerimaUser, $request, $result, $biayaAdmin) {
                 $baseKode = 'TRX-' . date('YmdHis') . '-' . rand(100, 999);
+                $catatanAdmin = $biayaAdmin > 0 ? ' (Admin Rp ' . number_format($biayaAdmin, 0, ',', '.') .  ')' : '';
 
                 $pengirimWallet->saldo = $result['sisa_saldo'];
                 $pengirimWallet->save();
@@ -186,8 +205,8 @@ class WalletController extends Controller
                 $pengirimWallet->transaksi()->create([
                     'kode_transaksi' => $baseKode . '-OUT',
                     'jenis'          => 'keluar',
-                    'jumlah'         => $request->jumlah,
-                    'keterangan'     => 'Transfer ke ' . $penerimaUser->name . ($request->keterangan ? ' - ' . $request->keterangan : '')
+                    'jumlah'         => $request->jumlah + $biayaAdmin,
+                    'keterangan'     => 'Transfer ke ' . $penerimaUser->name . ($request->keterangan ? ' - ' . $request->keterangan : '') . $catatanAdmin
                 ]);
 
                 $penerimaWallet->saldo += $request->jumlah;
@@ -201,7 +220,8 @@ class WalletController extends Controller
                 ]);
             });
 
-            return redirect('/dompet')->with('success', 'Transfer Rp ' . number_format($request->jumlah, 0, ',', '.') . ' ke ' . $penerimaUser->name . ' berhasil!');
+            $infoAdmin = $biayaAdmin > 0 ? ' (Biaya Admin Rp ' . number_format($biayaAdmin, 0, ',', '.') . ')' : ' (Gratis Admin)';
+            return redirect('/dompet')->with('success', 'Transfer Rp ' . number_format($request->jumlah, 0, ',', '.') . ' ke ' . $penerimaUser->name . $infoAdmin . ' berhasil!');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memproses transaksi database: ' . $e->getMessage());
         }
@@ -261,11 +281,11 @@ class WalletController extends Controller
     {
         if (!$user->pin) {
             return 'Anda Belum Membuat 6-Digit PIN transaksi!';
-        } 
+        }
 
         // cek dlu akun kena blokir ga
-        if ($user->pin_lock_until && now()->lessThan($user->pin_locked_until)) {
-            $sisaMenit = ceil(now()->diffInSeconds($user->pin_locked_until) /60);
+        if ($user->pin_locked_until && now()->lessThan($user->pin_locked_until)) {
+            $sisaMenit = ceil(now()->diffInSeconds($user->pin_locked_until) / 60);
             return "Transaksi di blokir sementara karna 3x salah PIN. COBA LAGI DALAM {$sisaMenit} Menit.";
         }
 
@@ -295,7 +315,7 @@ class WalletController extends Controller
         }
 
         return null;
-    } 
+    }
 
     public function updatePin(Request $request)
     {
@@ -321,5 +341,4 @@ class WalletController extends Controller
 
         return back()->with('success', 'PIN KEAMANAN BERHASIL DI PERBARUI');
     }
-
 }
