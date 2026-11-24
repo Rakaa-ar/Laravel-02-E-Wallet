@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 
 class WalletController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $userId = Auth::id();
         $user = User::find($userId);
@@ -35,11 +35,28 @@ class WalletController extends Controller
         $dompet = Wallet::firstOrCreate(
             ['user_id' => Auth::id()],
             ['saldo' => 0]
-        );
+        ); 
 
-        $riwayat = $dompet->transaksi()->latest()->paginate(5);
+        $query = $dompet->transaksi()->latest();
 
-        return view('wallet.index', compact('dompet', 'riwayat'));
+        if ($request->filled('dari_tanggal')) {
+            $query->whereDate('created_at', '>=', $request->dari_tanggal);
+        } 
+
+        if ($request->filled('sampai_tanggal')) {
+            $query->whereDate('created_at', '<=', $request->sampai_tanggal);
+        }
+
+        if ($request->filled('jenis') && in_array($request->jenis, ['masuk', 'keluar'])) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        $totalMasuk  = (clone $query)->where('jenis', 'masuk')->sum('jumlah');
+        $totalKeluar = (clone $query)->where('jenis', 'keluar')->sum('jumlah');
+
+        $riwayat = $query->paginate(5)->withQueryString();
+
+        return view('wallet.index', compact('dompet', 'riwayat', 'totalMasuk', 'totalKeluar'));
     }
 
     public function store(Request $request)
@@ -81,7 +98,10 @@ class WalletController extends Controller
         $tipeTransaksi = $request->jenis === 'masuk' ? 'topup' : 'tarik';
 
         try {
-            $response = Http::timeout(5)->post('http://localhost:8080/api/transaksi', [
+            $response = Http::timeout(5)->withHeaders([
+                'X-API-KEY' => env('GO_WALLET_API_KEY'),                
+            ])
+            ->post('http://localhost:8080/api/transaksi', [
                 'saldo_saat_ini' => (float) $dompet->saldo,
                 'jenis' => $request->jenis,
                 'tipe_transaksi' => $tipeTransaksi,
@@ -174,7 +194,10 @@ class WalletController extends Controller
 
         // Cek Kecukupan Saldo ke Go Microservice
         try {
-            $response = Http::timeout(5)->post('http://localhost:8080/api/transaksi', [
+            $response = Http::timeout(5)->withHeaders([
+                'X-API-KEY' => env('GO_WALLET_API_KEY'),
+            ])
+            ->post('http://localhost:8080/api/transaksi', [
                 'saldo_saat_ini' => (float) $pengirimWallet->saldo,
                 'jenis'          => 'keluar',
                 'jumlah'         => (float) $request->jumlah,
@@ -340,5 +363,39 @@ class WalletController extends Controller
         ]);
 
         return back()->with('success', 'PIN KEAMANAN BERHASIL DI PERBARUI');
+    }
+
+    public function cetakLaporan(Request $request)
+    {
+        $user = Auth::user();
+        $dompet = Wallet::where('user_id', $user->id)->firstOrFail();
+
+        $query = $dompet->transaksi()->latest();
+
+        if ($request->filled('dari_tanggal')) {
+            $query->whereDate('created_at', '>=', $request->dari_tanggal);
+        }
+
+        if ($request->filled('sampai_tanggal')) {
+            $query->whereDate('created_at', '<=', $request->sampai_tanggal);
+        }
+
+        if ($request->filled('jenis') && in_array($request->jenis, ['masuk', 'keluar'])) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        $transaksi = $query->get();
+        $totalMasuk = $transaksi->where('jenis', 'masuk')->sum('jumlah');
+        $totalKeluar = $transaksi->where('jenis', 'keluar')->sum('jumlah');
+
+        $pdf = Pdf::loadView('wallet.laporan_pdf', compact(
+            'user',
+            'dompet',
+            'transaksi',
+            'totalMasuk',
+            'totalKeluar'
+        ))->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Rekening-Koran-' . $user->account_number , '.pdf');
     }
 }

@@ -118,6 +118,58 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold mb-0">Riwayat Transaksi</h5>
                     </div>
+                    <!-- Ringkasan Arus Kas -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 wallet-dark-box">
+                                <small class="text-secondary d-block mb-1">Total Dana Masuk</small>
+                                <strong class="text-success fs-5">+ Rp
+                                    {{ number_format($totalMasuk, 0, ',', '.') }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 wallet-dark-box">
+                                <small class="text-secondary d-block mb-1">Total Dana Keluar + Admin
+                                    </small>
+                                <strong class="text-danger fs-5">- Rp
+                                    {{ number_format($totalKeluar, 0, ',', '.') }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Filter Mutasi & Cetak PDF -->
+                    <form method="GET" action="{{ url('/dompet') }}" class="row g-2 align-items-end mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small text-secondary mb-1">Dari Tanggal</label>
+                            <input type="date" name="dari_tanggal"
+                                class="form-control form-control-sm wallet-dark-input"
+                                value="{{ request('dari_tanggal') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-secondary mb-1">Sampai Tanggal</label>
+                            <input type="date" name="sampai_tanggal"
+                                class="form-control form-control-sm wallet-dark-input"
+                                value="{{ request('sampai_tanggal') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-secondary mb-1">Jenis</label>
+                            <select name="jenis" class="form-select form-select-sm wallet-dark-input">
+                                <option value="">Semua</option>
+                                <option value="masuk" {{ request('jenis') == 'masuk' ? 'selected' : '' }}>Masuk
+                                </option>
+                                <option value="keluar" {{ request('jenis') == 'keluar' ? 'selected' : '' }}>Keluar
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-indigo fw-semibold px-3">Filter</button>
+                            <a href="{{ url('/dompet') }}" class="btn btn-sm btn-outline-light px-3">Reset</a>
+                            <a href="{{ route('wallet.laporan.pdf', request()->query()) }}" target="_blank"
+                                class="btn btn-sm btn-danger fw-semibold px-1 text-nowrap">
+                                Cetak PDF
+                            </a>
+                        </div>
+                    </form>
 
                     @if (session('success'))
                         <div id="alert-box" class="alert alert-success alert-dismissible fade show border-0 bg-masuk"

@@ -36,6 +36,23 @@ func hitungBiayaAdmin(tipe string, jumlah float64) float64 {
 	default:
 		return 0
 	}
+} 
+
+const ApiSecretKey = "rahasia-wallet-raka-2026"
+
+func cekApiKey(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-API-KEY") != ApiSecretKey {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(TransaksiResponse{
+				Status: false,
+				Pesan:  "Akses ditolak: API Key tidak valid!",
+			})
+			return
+		}
+		next(w, r)
+	}
 }
 
 func prosesTransaksi(w http.ResponseWriter, r *http.Request) {

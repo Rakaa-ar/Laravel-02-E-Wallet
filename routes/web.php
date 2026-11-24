@@ -40,6 +40,7 @@ Route::post('/dompet/ganti-pin', [WalletController::class, 'updatePin' ])->name(
 
 Route::get('/dompet/cek-penerima/{account_number}', [WalletController::class, 'cekPenerima'])->name('cek.penerima');
 Route::get('dompet/struk/{kode_transaksi}', [WalletController::class, 'cetakStruk'])->name('cetak.struk');
+Route::get('/dompet/laporan-pdf', [WalletController::class, 'cetakLaporan'])->name('wallet.laporan.pdf');
 
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
