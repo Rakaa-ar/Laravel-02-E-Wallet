@@ -18,6 +18,7 @@ class User extends Authenticatable
         'pin_attempts',
         'pin_locked_until',
         'google_id',
+        'github_id',
         'otp',
         'otp_expires_at',
         'is_verified',

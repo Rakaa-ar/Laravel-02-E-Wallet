@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\DB;
+use App\Models\Wallet; 
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -119,33 +120,39 @@ class AuthController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+            $driver = Socialite::driver('google');
+            $googleUser = $driver->stateless()->user();
 
             $user = User::where('google_id', $googleUser->getId())
                 ->orWhere('email', $googleUser->getEmail())
                 ->first();
 
             if (!$user) {
-
                 $user = User::create([
-                    'name' => $googleUser->getName(),
-                    'email' => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    'password' => bcrypt(Str::random(16)),
+                    'name'        => $googleUser->getName(),
+                    'email'       => $googleUser->getEmail(),
+                    'google_id'   => $googleUser->getId(),
+                    'password'    => bcrypt(Str::random(16)),
+                    'is_verified' => true,
                 ]);
             } else {
                 $user->update([
-                    'google_id' => $googleUser->getId(),
+                    'google_id'   => $googleUser->getId(),
+                    'is_verified' => true,
                 ]);
             }
 
-            Auth::login($user);
+            Auth::login($user, true);
+            $request->session()->regenerate();
+            $request->session()->save();
+
             return redirect('/dompet');
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Gagal Login dengan google. coba lagi');
+            return redirect('/login')->with('error', 'Error Google: ' . $e->getMessage());
         }
     }
 

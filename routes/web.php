@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\AuthController;
 
+Route::get('/', function () {
+  return redirect('/login');
+});
+
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 Route::middleware('guest')->group(function () {
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -17,9 +23,6 @@ Route::post('/register', [AuthController::class, 'storeRegister']);
 Route::get('/verify-otp', [AuthController::class, 'showOtpForm'])->name('otp.verify');
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 
-
-Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgot-password', [AuthController::class, 'processForgotPassword'])->name('password.email');
