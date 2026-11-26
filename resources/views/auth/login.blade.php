@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Mini E-Wallet</title>
+    <title>Login - Arvanta E-Wallet</title>
     @vite(['resources/css/login.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -13,7 +13,7 @@
 <body class="login-body">
 
     <div class="login-card">
-        <h3 class="fw-bold text-white mb-1">Welcome Back!</h3>
+        <h3 class="fw-bold text-white mb-1">Arvanta Wallet</h3>
         <p class="text-abu mb-4" style="font-size: 0.9rem;">Sign in to your account</p>
 
         @if ($errors->any())
@@ -57,12 +57,6 @@
         <div class="d-flex justify-content-center gap-3 mb-4">
             <a href="{{ route('google.login') }}" class="social-btn text-decoration-none">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="20">
-            </a>
-            <a href="#" class="social-btn text-decoration-none text-white fs-5">
-                <i class="bi bi-apple"></i>
-            </a>
-            <a href="#" class="social-btn text-decoration-none text-white fs-5">
-                <i class="bi bi-github"></i>
             </a>
         </div>
 

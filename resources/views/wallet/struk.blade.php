@@ -10,7 +10,7 @@
 <body class="struk-body">
     <div class="struk-container">
         <div class="struk-header">
-            <h2>E-WALLET KOPDES</h2>
+            <h2>Arvanta E-Wallet</h2>
             <p>Bukti Transaksi Digital</p>
         </div>
 
