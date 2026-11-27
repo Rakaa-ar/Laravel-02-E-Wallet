@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
   return redirect('/login');
@@ -44,6 +45,10 @@ Route::post('/dompet/ganti-pin', [WalletController::class, 'updatePin' ])->name(
 Route::get('/dompet/cek-penerima/{account_number}', [WalletController::class, 'cekPenerima'])->name('cek.penerima');
 Route::get('dompet/struk/{kode_transaksi}', [WalletController::class, 'cetakStruk'])->name('cetak.struk');
 Route::get('/dompet/laporan-pdf', [WalletController::class, 'cetakLaporan'])->name('wallet.laporan.pdf');
+
+Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
 
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

@@ -37,10 +37,11 @@
                     </button>
                 </form>
 
-                <div class="bg-white p-1 rounded-circle shadow-sm d-flex">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Raka Pradiva') }}&background=6f42c1&color=fff"
-                        alt="Profile" class="rounded-circle" width="48" height="48">
-                </div>
+                <a href="{{ route('profile.index') }}"
+                    class="bg-white p-1 rounded-circle shadow-sm d-flex text-decoration-none" title="Profil Saya">
+                    <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name ?? 'Raka Pradiva') . '&background=6f42c1&color=fff' }}"
+                        alt="Profile" class="rounded-circle object-fit-cover" width="48" height="48">
+                </a>
 
             </div>
         </div>
@@ -130,7 +131,7 @@
                         <div class="col-md-6">
                             <div class="p-3 rounded-3 wallet-dark-box">
                                 <small class="text-secondary d-block mb-1">Total Dana Keluar + Admin
-                                    </small>
+                                </small>
                                 <strong class="text-danger fs-5">- Rp
                                     {{ number_format($totalKeluar, 0, ',', '.') }}</strong>
                             </div>
@@ -272,7 +273,6 @@
     @include('wallet.partials.modal-ganti-pin')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
 </body>
 
 </html>

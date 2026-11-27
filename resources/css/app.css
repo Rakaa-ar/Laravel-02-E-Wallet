@@ -213,3 +213,184 @@ nav p.text-muted {
     background-color: #4338ca;
     color: #fff;
 }
+
+/* --- Theme Variables (Siap untuk Dark & Light Mode nanti) --- */
+:root {
+    --bg-main: #0c0f17;
+    --bg-card: #131826;
+    --bg-subcard: #0f131f;
+    --bg-input: #0b0e17;
+    --bg-readonly: #161c2c;
+    --border-soft: rgba(255, 255, 255, 0.07);
+    --border-focus: #6366f1;
+    --text-primary: #f1f5f9;
+    --text-secondary: #8b95a5;
+    --accent-purple: #6c5ce7;
+    --accent-purple-hover: #5b4bc4;
+}
+
+body.arvanta-body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 0.92rem;
+}
+
+.card-arvanta {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.subcard-arvanta {
+    background-color: var(--bg-subcard);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+}
+
+.label-arvanta {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 0.45rem;
+}
+
+.form-control-arvanta {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-soft);
+    color: var(--text-primary);
+    border-radius: 10px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control-arvanta::placeholder {
+    color: #525d73;
+}
+
+.form-control-arvanta:focus {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.form-control-arvanta[readonly] {
+    background-color: var(--bg-readonly);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+/* Custom File Input biar ga kotak putih bawaan browser */
+.form-control-arvanta[type="file"] {
+    padding: 0.45rem 0.65rem;
+    color: var(--text-secondary);
+}
+
+.form-control-arvanta[type="file"]::file-selector-button {
+    background-color: rgba(108, 92, 231, 0.16);
+    color: #a5b4fc;
+    border: 1px solid rgba(108, 92, 231, 0.35);
+    border-radius: 7px;
+    padding: 0.35rem 0.85rem;
+    margin-right: 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.form-control-arvanta[type="file"]::file-selector-button:hover {
+    background-color: var(--accent-purple);
+    color: #fff;
+}
+
+/* Avatar & Wrapper */
+.avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar-circle {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(108, 92, 231, 0.6);
+}
+
+.avatar-initial {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6c5ce7, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+/* ID Badge selaras dengan badge ID User di /dompet */
+.id-badge {
+    background-color: var(--bg-subcard);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+
+.btn-copy-soft {
+    background-color: rgba(108, 92, 231, 0.15);
+    color: #a5b4fc;
+    border: 1px solid rgba(108, 92, 231, 0.3);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 5px 11px;
+    transition: all 0.2s ease;
+}
+
+.btn-copy-soft:hover {
+    background-color: var(--accent-purple);
+    color: #fff;
+}
+
+/* Tombol Simpan Utama (sekarang jelas & soft) */
+.btn-arvanta-primary {
+    background-color: var(--accent-purple);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.6rem 1.35rem;
+    transition: all 0.2s ease;
+}
+
+.btn-arvanta-primary:hover {
+    background-color: var(--accent-purple-hover);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn-arvanta-ghost {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    color: var(--text-primary);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-arvanta-ghost:hover {
+    background-color: var(--bg-readonly);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.16);
+}
