@@ -177,6 +177,84 @@ if (formGantiPin) {
     });
 }
 
+window.copyAccountId = function () {
+    const idEl = document.getElementById('accountNumberText');
+    const btn = document.getElementById('btnCopyId');
+    if (!idEl || !btn) return;
+
+    navigator.clipboard.writeText(idEl.innerText.trim());
+
+    btn.innerHTML = '<i class="bi bi-check2 me-1"></i> Tersalin';
+    setTimeout(() => {
+        btn.innerHTML = '<i class="bi bi-clipboard me-1"></i> Salin';
+    }, 1800);
+};
+
+window.previewAvatar = function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader =  new FileReader();
+    reader.onload = function (e) {
+        const img = document.getElementById('avatarPreviewImg');
+        const initial = document.getElementById('avatarPreviewInitial');
+        if (img) {
+            img.src = e.target.result;
+            img.classList.remove('d-none');
+        }
+        if (initial) {
+            initial.classList.add('d-none');
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const successAlert = document.getElementById('successAlert');
+    if (successAlert) {
+        setTimeout(() => {
+            successAlert.style.opacity = '0';
+            setTimeout(() => successAlert.remove(), 400);
+        }, 3000);
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('arvanta-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+});
+
+window.toggleTheme = function () {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('arvanta-theme', nextTheme);
+    updateThemeIcon(nextTheme);
+};
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('themeIcon');
+    const text = document.getElementById('themeText');
+    if (!icon) return;
+
+    if (theme === 'light') {
+        icon.className = 'bi bi-moon-stars-fill';
+        if (text) text.innerText = 'Dark';
+    } else {
+        icon.className = 'bi bi-sun-fill';
+        if (text) text.innerText = 'Light';
+    }
+}
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'arvanta-theme' && e.newValue) {
+        document.documentElement.setAttribute('data-theme', e.newValue);
+        updateThemeIcon(e.newValue);
+    }
+});
+
 
 
 

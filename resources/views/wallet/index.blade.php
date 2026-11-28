@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arvanta | Raka</title>
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('arvanta-theme') || 'dark');
+    </script>
+    <title>Arvanta | {{ Auth::user()->name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -14,7 +17,12 @@
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <h3 class="fw-bold mb-1 text-white">Overview Keuangan</h3>
+                <h3 class="fw-bold mb-1 text-white">Overview Keuangan <button type="button"
+                        class="btn btn-arvanta-ghost d-inline-flex align-items-center gap-2" onclick="toggleTheme()"
+                        title="Ganti Tema">
+                        <i class="bi bi-sun-fill" id="themeIcon"></i>
+                        <span id="themeText">Light</span>
+                    </button></h3>
                 <p class="text-secondary mb-0">Halo {{ Auth::user()->name ?? 'Raka' }}, kelola saldomu di sini.</p>
             </div>
 

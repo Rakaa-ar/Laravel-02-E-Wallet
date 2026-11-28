@@ -309,7 +309,6 @@ body.arvanta-body {
     color: #fff;
 }
 
-/* Avatar & Wrapper */
 .avatar-wrapper {
     position: relative;
     display: inline-block;
@@ -336,7 +335,6 @@ body.arvanta-body {
     color: #fff;
 }
 
-/* ID Badge selaras dengan badge ID User di /dompet */
 .id-badge {
     background-color: var(--bg-subcard);
     border: 1px solid var(--border-soft);
@@ -360,7 +358,6 @@ body.arvanta-body {
     color: #fff;
 }
 
-/* Tombol Simpan Utama (sekarang jelas & soft) */
 .btn-arvanta-primary {
     background-color: var(--accent-purple);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -393,4 +390,173 @@ body.arvanta-body {
     background-color: var(--bg-readonly);
     color: #fff;
     border-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="light"] {
+    --bg-main: #eef2f6;
+    --bg-card: #ffffff;
+    --bg-subcard: #f1f5f9;
+    --bg-input: #e2e8f0;
+    --bg-readonly: #cbd5e1;
+    --border-soft: #cbd5e1;
+    --border-focus: #6c5ce7;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] body.arvanta-body {
+    background: var(--bg-main) !important;
+    background-color: var(--bg-main) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .card-arvanta,
+[data-theme="light"] .card-custom,
+[data-theme="light"] .modal-content {
+    background-color: var(--bg-card) !important;
+    border: 1px solid #dde3ec !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .wallet-dark-box,
+[data-theme="light"] .subcard-arvanta,
+[data-theme="light"] .id-badge {
+    background-color: var(--bg-subcard) !important;
+    border: 1px solid #cbd5e1 !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .form-control-arvanta,
+[data-theme="light"] .form-control,
+[data-theme="light"] .form-select,
+[data-theme="light"] .wallet-dark-input {
+    background-color: var(--bg-input) !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .form-control-arvanta:focus,
+[data-theme="light"] .form-control:focus,
+[data-theme="light"] .form-select:focus,
+[data-theme="light"] .wallet-dark-input:focus {
+    background-color: #f8fafc !important;
+    border-color: #6c5ce7 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .form-control-arvanta[readonly],
+[data-theme="light"] .form-control[readonly] {
+    background-color: var(--bg-readonly) !important;
+    color: #475569 !important;
+}
+
+[data-theme="light"] .form-control::placeholder,
+[data-theme="light"] .form-control-arvanta::placeholder {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-dark,
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6 {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .table > :not(caption) > * > * {
+    background-color: transparent !important;
+    border-bottom-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .table thead th {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .badge.bg-success.bg-opacity-10 {
+    background-color: rgba(16, 185, 129, 0.16) !important;
+    color: #059669 !important;
+}
+
+[data-theme="light"] .badge.bg-primary.bg-opacity-10 {
+    background-color: rgba(59, 130, 246, 0.16) !important;
+    color: #2563eb !important;
+}
+
+[data-theme="light"] .wallet-card,
+[data-theme="light"] .wallet-card p,
+[data-theme="light"] .wallet-card h2,
+[data-theme="light"] .wallet-card .badge {
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .wallet-card .btn {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+[data-theme="light"] .btn-outline-light {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .btn-outline-info {
+    background-color: #ffffff !important;
+    color: #0284c7 !important;
+    border-color: #0284c7 !important;
+}
+
+[data-theme="light"] .btn-outline-info:hover {
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .pagination .page-link {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .pagination .page-item.active .page-link {
+    background-color: #6c5ce7 !important;
+    border-color: #6c5ce7 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-close-white {
+    filter: none !important;
+}
+
+html[data-theme="light"] .card-custom .table tbody tr td h6,
+html[data-theme="light"] .card-custom .table tbody tr td h6.text-dark,
+html[data-theme="light"] .card-custom .table tbody tr td div > h6 {
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] .card-custom .table tbody tr td small.text-muted,
+html[data-theme="light"] .card-custom .table tbody tr td.text-muted {
+    color: #475569 !important;
+}
+
+html[data-theme="light"] .card-custom .table tbody tr td.text-success {
+    color: #16a34a !important;
+}
+
+html[data-theme="light"] .card-custom .table tbody tr td.text-dark {
+    color: #0f172a !important;
+}
+
+html[data-theme="light"] .card-custom .table tbody tr td.text-success {
+    color: #16a34a !important;
+}
+
+html[data-theme="light"] .card-custom .table tbody tr td.text-dark {
+    color: #dc2626 !important;
 }
